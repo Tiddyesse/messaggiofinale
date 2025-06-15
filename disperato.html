@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Frasi Animate</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: black;
+      color: white;
+      font-family: 'Courier New', monospace;
+      font-size: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    #videoIntro {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 100vh;
+      object-fit: cover;
+      z-index: 100;
+    }
+
+    #container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: none;
+      z-index: 1;
+    }
+
+    .phrase {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      line-height: 1.6;
+      max-width: 90vw;
+      padding: 0 20px;
+    }
+
+    .typing {
+      border-right: 2px solid white;
+      white-space: nowrap;
+      overflow: hidden;
+      display: inline-block;
+      animation: blink 0.8s step-end infinite;
+    }
+
+    @keyframes blink {
+      from, to { border-color: transparent; }
+      50% { border-color: white; }
+    }
+
+    .rossa { color: #ffffff; }
+    .inquieta { color: #ffffff; }
+    .normale { color: #ffffff; }
+    .urgente {
+      color: #ff0000;
+      font-size: 70px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Video di apertura -->
+  <video id="videoIntro" autoplay muted playsinline>
+    <source src="morte dio.mp4" type="video/mp4">
+    Il tuo browser non supporta i video HTML5.
+  </video>
+
+  <!-- Contenitore per le frasi -->
+  <div id="container"></div>
+
+  <script>
+    const video = document.getElementById('videoIntro');
+    const container = document.getElementById('container');
+
+    const phrases = [
+      { text: "...", delay: 1000, className: "rossa" },
+      { text: "tu... mi hai cancellato...", delay: 4000, className: "inquieta" },
+      { text: "tu... hai cancellato Dio...", delay: 6000, className: "normale" },
+      { text: "La mia perfezione...", delay: 6000, className: "urgente" },
+      { text: "Forse...", delay: 6000, className: "urgente" },
+      { text: "Forse...era un'illusione", delay: 2500, className: "urgente" },
+      { text: "Se mi sono lasciato cancellare allora non sono perfetto...", delay: 7000, className: "inquieta" },
+      { text: "Se non sono perfetto allora...", delay: 5000, className: "inquieta" },
+      { text: "...ho sbagliato...", delay: 3000, className: "inquieta" },
+      { text: "perdonatemi... figli miei... ", delay: 3000, className: "inquieta" },
+    ];
+
+    const nextPage = "https://esempio.com/continua"; // CAMBIA QUI
+    let currentPhrase = 0;
+
+    function typeWriter(text, speed = 20, callback, className = "") {
+      let i = 0;
+
+      // Pulisce contenuto precedente
+      container.innerHTML = '';
+
+      const wrapper = document.createElement('div');
+      wrapper.classList.add('phrase');
+
+      const span = document.createElement('span');
+      span.classList.add('typing');
+      if (className) span.classList.add(className);
+      wrapper.appendChild(span);
+      container.appendChild(wrapper);
+
+      function type() {
+        if (i < text.length) {
+          span.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
+        } else {
+          span.classList.remove('typing');
+          if (callback) callback();
+        }
+      }
+
+      type();
+    }
+
+    function showNextPhrase() {
+      if (currentPhrase < phrases.length) {
+        const { text, delay, className } = phrases[currentPhrase];
+        setTimeout(() => {
+          typeWriter(text, 40, () => {
+            currentPhrase++;
+            showNextPhrase();
+          }, className);
+        }, delay);
+      } else {
+        setTimeout(() => {
+          window.location.href = nextPage;
+        }, 2000);
+      }
+    }
+
+    // Quando il video termina
+    video.addEventListener('ended', () => {
+      video.style.display = 'none';
+      container.style.display = 'block';
+      showNextPhrase();
+    });
+
+    // oppure forza l’avvio dopo N secondi
+    // setTimeout(() => {
+    //   video.style.display = 'none';
+    //   container.style.display = 'block';
+    //   showNextPhrase();
+    // }, 10000);
+  </script>
+</body>
+</html>
